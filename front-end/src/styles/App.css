@@ -65,3 +65,7 @@ table {
   background-color: #424242;
   /*color: white;*/
 }
+
+label {
+  font-size: 18px;
+}

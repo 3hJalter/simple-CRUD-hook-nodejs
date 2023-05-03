@@ -1,12 +1,16 @@
 import React, {useState, useEffect} from 'react';
-import logo from './logo.svg';
-import './App.css'
+import logo from './image/logo.svg';
+import './styles/App.css'
 import axios from 'axios';
+import non_id_url from "./constants/Url";
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import Nav from './components/Nav';
-import GetList from "./components/GetList";
-import {BrowserRouter as Router,
-    Route,
-    Switch} from 'react-router-dom'
+import BlogData from './components/BlogData';
+import GetBlogs from "./components/GetBlogs";
+import CreateBlog from "./components/CreateBlog";
+import UpdateBlog from "./components/UpdateBlog";
+import DeleteBlog from "./components/DeleteBlog";
+
 
 function App() {
     const [blogs, setBlogs] = useState([]);
@@ -18,20 +22,9 @@ function App() {
     const [image, setImage] = useState('');
     //
     useEffect(() => {
-        axios.get('http://localhost:3000/api/blogs')
+        axios.get(non_id_url)
             .then(response => setBlogs(response.data));
     }, []);
-
-    const handleAddBlog = () => {
-        const blog = {title, body, image};
-        axios.post('/api/blogs', blog)
-            .then(response => setBlogs([...blogs, response.data]));
-    };
-
-    const handleDeleteBlog = (id) => {
-        axios.delete(`/api/blogs/${id}`)
-            .then(() => setBlogs(blogs.filter(blog => blog._id !== id)));
-    };
 
     return (
         <Router>
@@ -41,22 +34,33 @@ function App() {
                     <img src={logo} className="App-logo" alt="logo"/>
                     <Switch>
                         <Route path="/" exact>
-                            <GetList
-                                blogs={blogs}
+                            <GetBlogs
                                 setBlogs={setBlogs}
                             />
                         </Route>
                         <Route path="/create" exact>
-
+                            <CreateBlog
+                                blogs={blogs}
+                                setBlogs={setBlogs}
+                            />
                         </Route>
                         <Route path="/update" exact>
-
+                            <UpdateBlog
+                                setBlogs={setBlogs}
+                            />
                         </Route>
                         <Route path="/delete" exact>
-
+                            <DeleteBlog
+                                blogs={blogs}
+                                setBlogs={setBlogs}
+                            />
                         </Route>
                     </Switch>
+                    <BlogData
+                        blogs={blogs}/>
                 </header>
+
+
             </div>
         </Router>
 

@@ -1,9 +1,8 @@
+require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 const cors = require('cors');
 const {Schema, connect, model, Types} = require('mongoose');
-
 const app = express();
 
 // Connect to MongoDB database
@@ -18,7 +17,7 @@ connect(process.env.MONGODB_URI || "mongodb+srv://it4409:it4409-soict@lamdb-crud
 app.use(cors());
 
 // Serve the frontend files
-app.use(express.static(path.join(__dirname, '../front-end/build')));
+// app.use(express.static(path.join(__dirname, '../front-end/build')));
 
 const blogSchema = new Schema({
     title: String,
@@ -36,15 +35,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // CREATE
-app.post('/api/blogs', async (req, res) => {
+app.post('/api/blogs/', async (req, res) => {
     const blog = new Blog(req.body);
     await blog.save();
-    res.json(blog);
+    res.json([blog]);
 });
 
 // READ
 app.get('/api/blogs', async (req, res) => {
-    console.log(' test ', req.query.id);
     const id  = req.query.id;
     if (!id) {
         const blogs = await Blog.find({});
@@ -52,12 +50,12 @@ app.get('/api/blogs', async (req, res) => {
         return;
     }
     if (!Types.ObjectId.isValid(id)) {
-        res.json([]); // Return an empty array if the id is invalid
+        res.json({message: 'Invalid input id'}); // Return an empty array if the id is invalid
         return;
     }
     const blog = await Blog.findById(id);
     if (!blog) {
-        res.json([]);
+        res.json({message: 'Blog not found'});
         return;
     }
     res.json([blog]);
@@ -66,18 +64,34 @@ app.get('/api/blogs', async (req, res) => {
 // UPDATE
 app.put('/api/blogs/:id', async (req, res) => {
     const { id } = req.params;
+    if (!id || !Types.ObjectId.isValid(id)) {
+        res.json({ message: 'Invalid input' });
+        return;
+    }
     const blog = await Blog.findByIdAndUpdate(id, req.body, { new: true });
-    res.json(blog);
+    if (!blog) {
+        res.json({message: 'Not found blog'})
+        return;
+    }
+    res.json([blog]);
 });
 
 // DELETE
 app.delete('/api/blogs/:id', async (req, res) => {
     const { id } = req.params;
-    await Blog.findByIdAndDelete(id);
+    if (!id || !Types.ObjectId.isValid(id)) {
+        res.json({ message: 'Invalid input' });
+        return;
+    }
+    const blog = await Blog.findByIdAndDelete(id);
+    if (!blog) {
+        res.json({ message: 'Not found blog' });
+        return;
+    }
     res.json({ message: 'Blog deleted successfully' });
 });
 
-app.listen(3000, () => {
+app.listen(3001, () => {
     console.log('listening on http://localhost');
     console.log('Server is running on port 3000');
 });
