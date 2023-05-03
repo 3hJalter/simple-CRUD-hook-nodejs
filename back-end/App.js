@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
-const {Schema, connect, model} = require('mongoose');
+const {Schema, connect, model, Types} = require('mongoose');
 
 const app = express();
 
@@ -23,7 +23,11 @@ app.use(express.static(path.join(__dirname, '../front-end/build')));
 const blogSchema = new Schema({
     title: String,
     body: String,
-    image: String
+    image: String,
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
 const Blog = model('Blog', blogSchema);
@@ -40,8 +44,23 @@ app.post('/api/blogs', async (req, res) => {
 
 // READ
 app.get('/api/blogs', async (req, res) => {
-    const blogs = await Blog.find({});
-    res.json(blogs);
+    console.log(' test ', req.query.id);
+    const id  = req.query.id;
+    if (!id) {
+        const blogs = await Blog.find({});
+        res.json(blogs);
+        return;
+    }
+    if (!Types.ObjectId.isValid(id)) {
+        res.json([]); // Return an empty array if the id is invalid
+        return;
+    }
+    const blog = await Blog.findById(id);
+    if (!blog) {
+        res.json([]);
+        return;
+    }
+    res.json([blog]);
 });
 
 // UPDATE

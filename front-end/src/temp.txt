@@ -1,0 +1,36 @@
+                <h1>Blogs</h1>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Body</th>
+                        <th>Image</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {blogs.map(blog => (
+                        <tr key={blog._id}>
+                            <td>{blog.title}</td>
+                            <td>{blog.body}</td>
+                            <td>{blog.image}</td>
+                            <td>
+                                <button onClick={() => handleDeleteBlog(blog._id)}>Delete</button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+                <h2>Add Blog</h2>
+                <div>
+                    <label>Title:</label>
+                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}/>
+                </div>
+                <div>
+                    <label>Body:</label>
+                    <input type="text" value={body} onChange={(e) => setBody(e.target.value)}/>
+                </div>
+                <div>
+                    <label>Image:</label>
+                    <input type="text" value={image} onChange={(e) => setImage(e.target.value)}/>
+                </div>
+                <button onClick={handleAddBlog}>Add</button>
